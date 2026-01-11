@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="google-site-verification" content="s-Cs4VOsyHol_XJz5s0kNgCIt3jc1szoZ0JQPi1YvsA" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>宿泊業適正診断</title>
 
   <style>
@@ -493,11 +493,11 @@
 
     function messageFromRank(rank){
       switch(rank){
-        case "S": return "かなり強い条件。収益設計（ADR/稼働/コスト）の詰めで勝てる可能性が高いです。";
-        case "A": return "十分に戦える条件。弱点項目を補う運用設計で堅くいけます。";
-        case "B": return "伸びしろあり。改善できる項目（駐車場/資金/距離）を先に潰すと安定します。";
-        case "C": return "要検討。数字の根拠（稼働/単価）を保守的に置き、投資回収の安全域を確保して判断。";
-        default: return "慎重に。条件が弱い可能性。別物件の検討か、強い差別化/高単価戦略が必要です。";
+        case "S": return "収益性と条件が非常に良く、プロも即検討するレベルの優良です。";
+        case "A": return "十分に利益が狙える好条件で、実行する価値の高いです。";
+        case "B": return "工夫次第で成り立つが、立地や条件の見極めが必要なです。";
+        case "C": return "収益が不安定になりやすく、慎重な検討が必要なです。";
+        default: return "条件が厳しく、宿泊業としてはおすすめできないです。";
       }
     }
 
@@ -585,7 +585,7 @@
       barsEl.appendChild(barRow("空港距離", sTime, MAX.time));
       barsEl.appendChild(barRow("駐車場", sParking, MAX.parking));
       barsEl.appendChild(barRow("旅館業", sPermit, MAX.permit));
-      barsEl.appendChild(barRow("自己資金", sCash, MAX.cash));
+      barsEl.appendChild(barRow("自己資金比率", sCash, MAX.cash));
 
       // 結果カードへスクロール（モバイル親切）
       resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
