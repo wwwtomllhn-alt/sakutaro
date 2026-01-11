@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>宿泊業適正診断</title>
+
+  <style>
+    :root{
+      --bg: #f5f5f7;
+      --card: rgba(255,255,255,.78);
+      --text: #1d1d1f;
+      --muted: rgba(29,29,31,.68);
+      --border: rgba(0,0,0,.08);
+      --shadow: 0 18px 40px rgba(0,0,0,.10);
+
+      --accent: #007aff; /* Apple blue */
+      --accent2:#34c759; /* green */
+      --warn: #ff9500;
+      --danger:#ff3b30;
+
+      --track: rgba(0,0,0,.10);
+      --bar: linear-gradient(90deg, #007aff, #5ac8fa);
+      --radius: 18px;
+      --radius-sm: 12px;
+
+      --focus: 0 0 0 4px rgba(0,122,255,.18);
+      --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+              "Hiragino Sans", "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0b0b0f;
+        --card: rgba(28,28,30,.72);
+        --text: #f5f5f7;
+        --muted: rgba(245,245,247,.70);
+        --border: rgba(255,255,255,.10);
+        --shadow: 0 18px 40px rgba(0,0,0,.45);
+
+        --track: rgba(255,255,255,.12);
+        --bar: linear-gradient(90deg, #0a84ff, #64d2ff);
+        --focus: 0 0 0 4px rgba(10,132,255,.22);
+      }
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: var(--font);
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(0,122,255,.18), transparent 55%),
+                  radial-gradient(1000px 600px at 85% 0%, rgba(52,199,89,.14), transparent 55%),
+                  var(--bg);
+      min-height:100dvh;
+      padding: 22px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+
+    .wrap{
+      width:min(760px, 100%);
+    }
+
+    .hero{
+      margin: 8px 0 14px;
+      padding: 8px 4px;
+    }
+
+    .title{
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      margin: 0 0 6px;
+      line-height: 1.18;
+    }
+    .subtitle{
+      margin: 0;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.55;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .form-card{
+      padding: 18px;
+    }
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin: 0 0 12px;
+    }
+    .section-title h2{
+      margin:0;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+    .hint{
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.4;
+    }
+
+    .fields{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px){
+      .fields{
+        grid-template-columns: 1fr 1fr;
+      }
+      .span-2{ grid-column: span 2; }
+    }
+
+    label{
+      display:block;
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 2px 0 6px;
+      letter-spacing: .02em;
+    }
+
+    .control{
+      width:100%;
+      appearance:none;
+      -webkit-appearance:none;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.70);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 12px 12px;
+      font-size: 15px;
+      line-height: 1.2;
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .06s ease;
+    }
+
+    @media (prefers-color-scheme: dark){
+      .control{
+        background: rgba(255,255,255,.06);
+      }
+    }
+
+    .control:focus{
+      box-shadow: var(--focus);
+      border-color: rgba(0,122,255,.55);
+    }
+
+    .control:active{
+      transform: translateY(0.5px);
+    }
+
+    select.control{
+      padding-right: 38px;
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) 52%,
+        calc(100% - 12px) 52%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat:no-repeat;
+    }
+
+    .row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border: none;
+      cursor:pointer;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 10px 22px rgba(0,122,255,.25);
+      transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+      min-width: 160px;
+    }
+    .btn:hover{ filter: brightness(1.03); }
+    .btn:active{ transform: translateY(1px); box-shadow: 0 6px 14px rgba(0,122,255,.22); }
+    .btn:focus{ outline:none; box-shadow: 0 0 0 4px rgba(0,122,255,.22), 0 10px 22px rgba(0,122,255,.20); }
+
+    .mini{
+      font-size: 12.5px;
+      color: var(--muted);
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.55);
+    }
+    @media (prefers-color-scheme: dark){
+      .pill{ background: rgba(255,255,255,.06); }
+    }
+
+    .error{
+      margin-top: 10px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,59,48,.25);
+      background: rgba(255,59,48,.10);
+      color: var(--text);
+      display:none;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    /* Result */
+    .result-card{
+      padding: 18px;
+      display:none;
+    }
+
+    .result-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 14px;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+
+    .rank{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+    }
+
+    .rank-badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.55);
+      width: fit-content;
+    }
+    @media (prefers-color-scheme: dark){
+      .rank-badge{ background: rgba(255,255,255,.06); }
+    }
+
+    .rank-letter{
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .rank-meta{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .rank-meta .pct{
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .rank-meta .score{
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .message{
+      margin-left:auto;
+      max-width: 420px;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+
+    .bars{
+      display:grid;
+      gap: 12px;
+    }
+
+    .bar-row{
+      display:grid;
+      gap: 6px;
+    }
+
+    .bar-head{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .bar-head .name{
+      font-size: 13.5px;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+    }
+    .bar-head .val{
+      font-size: 12.5px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+
+    .track{
+      height: 10px;
+      background: var(--track);
+      border-radius: 999px;
+      overflow:hidden;
+      position:relative;
+    }
+    .fill{
+      height:100%;
+      width:0%;
+      background: var(--bar);
+      border-radius: 999px;
+      transition: width .65s cubic-bezier(.2,.8,.2,1);
+    }
+    .fill.bad{
+      background: linear-gradient(90deg, var(--danger), var(--warn));
+    }
+
+    .note{
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      line-height: 1.55;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1 class="title">宿泊業適正診断</h1>
+      <p class="subtitle">
+        立地・規制・資金の観点から「宿に向いているか」をスコア化します。<br>
+        入力して「診断」を押すだけ。
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="card form-card">
+        <div class="section-title">
+          <h2>物件情報</h2>
+          <div class="hint">※すべて必須（0は不可）</div>
+        </div>
+
+        <div class="fields">
+          <div>
+            <label for="area">延床（㎡）</label>
+            <input id="area" class="control" type="number" inputmode="decimal" placeholder="例：120" min="0" />
+          </div>
+
+          <div>
+            <label for="time">空港からの時間（分）</label>
+            <input id="time" class="control" type="number" inputmode="decimal" placeholder="例：40" min="0" />
+          </div>
+
+          <div>
+            <label for="parking">駐車場</label>
+            <select id="parking" class="control">
+              <option value="">選択してください</option>
+              <option value="1">敷地内</option>
+              <option value="2">徒歩圏内</option>
+              <option value="0">なし</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="permit">旅館業取得地域</label>
+            <select id="permit" class="control">
+              <option value="">選択してください</option>
+              <option value="1">可能</option>
+              <option value="0">不可能</option>
+            </select>
+          </div>
+
+          <div class="span-2">
+            <label for="cash">自己資金比率（％）</label>
+            <input id="cash" class="control" type="number" inputmode="decimal" placeholder="例：自己資金 ÷ 物件価格 × 100（例：15）" min="0" />
+          </div>
+        </div>
+
+        <div class="row">
+          <button class="btn" id="btn">診断</button>
+
+          <div class="mini">
+            <span class="pill">満点条件：延床150㎡ / 自己資金20%</span>
+            <span class="pill">空港：400分で0点</span>
+          </div>
+        </div>
+
+        <div class="error" id="error"></div>
+      </div>
+
+      <div class="card result-card" id="resultCard">
+        <div class="result-top">
+          <div class="rank">
+            <div class="rank-badge" id="rankBadge">
+              <span class="rank-letter" id="rankLetter">-</span>
+              <div class="rank-meta">
+                <div class="pct" id="rankPct">-</div>
+                <div class="score" id="rankScore">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="message" id="message">
+            入力後に結果が表示されます。
+          </div>
+        </div>
+
+        <div class="bars" id="bars"></div>
+
+        <div class="note">
+          ※これは簡易スコアです。実際の収益性は「想定ADR・稼働・運営コスト・競合・条例」等で大きく変わります。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const areaEl = document.getElementById("area");
+    const timeEl = document.getElementById("time");
+    const parkingEl = document.getElementById("parking");
+    const permitEl = document.getElementById("permit");
+    const cashEl = document.getElementById("cash");
+
+    const btn = document.getElementById("btn");
+    const errorEl = document.getElementById("error");
+
+    const resultCard = document.getElementById("resultCard");
+    const rankLetterEl = document.getElementById("rankLetter");
+    const rankPctEl = document.getElementById("rankPct");
+    const rankScoreEl = document.getElementById("rankScore");
+    const messageEl = document.getElementById("message");
+    const barsEl = document.getElementById("bars");
+    const rankBadge = document.getElementById("rankBadge");
+
+    const MAX = { area: 100, time: 100, parking: 100, permit: 100, cash: 100 };
+    const maxScore = 500;
+
+    function showError(msg){
+      errorEl.textContent = msg;
+      errorEl.style.display = "block";
+    }
+    function hideError(){
+      errorEl.textContent = "";
+      errorEl.style.display = "none";
+    }
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function rankFromRate(rate){
+      if(rate >= 0.90) return "S";
+      if(rate >= 0.75) return "A";
+      if(rate >= 0.60) return "B";
+      if(rate >= 0.45) return "C";
+      return "D";
+    }
+
+    function messageFromRank(rank){
+      switch(rank){
+        case "S": return "かなり強い条件。収益設計（ADR/稼働/コスト）の詰めで勝てる可能性が高いです。";
+        case "A": return "十分に戦える条件。弱点項目を補う運用設計で堅くいけます。";
+        case "B": return "伸びしろあり。改善できる項目（駐車場/資金/距離）を先に潰すと安定します。";
+        case "C": return "要検討。数字の根拠（稼働/単価）を保守的に置き、投資回収の安全域を確保して判断。";
+        default: return "慎重に。条件が弱い可能性。別物件の検討か、強い差別化/高単価戦略が必要です。";
+      }
+    }
+
+    function barRow(label, score, max){
+      const pct = max === 0 ? 0 : clamp((score / max) * 100, 0, 100);
+      const isBad = (score / max) < 0.60;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "bar-row";
+
+      const head = document.createElement("div");
+      head.className = "bar-head";
+
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = label;
+
+      const val = document.createElement("div");
+      val.className = "val";
+      val.textContent = `${score.toFixed(1)} / ${max}`;
+
+      const track = document.createElement("div");
+      track.className = "track";
+
+      const fill = document.createElement("div");
+      fill.className = "fill" + (isBad ? " bad" : "");
+      // アニメーションのため一旦0→後からpctへ
+      fill.style.width = "0%";
+
+      track.appendChild(fill);
+      head.appendChild(name);
+      head.appendChild(val);
+
+      wrapper.appendChild(head);
+      wrapper.appendChild(track);
+
+      // 次フレームで幅を反映（アニメーション）
+      requestAnimationFrame(() => {
+        fill.style.width = pct + "%";
+      });
+
+      return wrapper;
+    }
+
+    function calc(){
+      hideError();
+
+      const area = Number(areaEl.value);
+      const time = Number(timeEl.value);
+      const parking = parkingEl.value === "" ? NaN : Number(parkingEl.value);
+      const permit = permitEl.value === "" ? NaN : Number(permitEl.value);
+      const cashRate = Number(cashEl.value);
+
+      // 必須チェック
+      if(!area || isNaN(area) || area < 0) return showError("延床（㎡）を入力してください。");
+      if(timeEl.value === "" || isNaN(time) || time < 0) return showError("空港からの時間（分）を入力してください。");
+      if(isNaN(parking)) return showError("駐車場を選択してください。");
+      if(isNaN(permit)) return showError("旅館業取得地域を選択してください。");
+      if(cashEl.value === "" || isNaN(cashRate) || cashRate < 0) return showError("自己資金比率（％）を入力してください。");
+
+      // スコア計算
+      const sArea = clamp((area / 150) * MAX.area, 0, MAX.area);               // 150㎡で満点
+      const sTime = clamp((1 - (time / 400)) * MAX.time, 0, MAX.time);         // 400分で0点
+      let sParking = 0;
+      if(parking === 1) sParking = MAX.parking;
+      else if(parking === 2) sParking = MAX.parking * 0.5;
+      const sPermit = permit === 1 ? MAX.permit : 0;
+      const sCash = clamp((cashRate / 20) * MAX.cash, 0, MAX.cash);            // 20%で満点
+
+      const score = sArea + sTime + sParking + sPermit + sCash;
+      const rate = score / maxScore;
+
+      const rank = rankFromRate(rate);
+
+      // 表示
+      resultCard.style.display = "block";
+      rankLetterEl.textContent = rank;
+      rankPctEl.textContent = `達成率：${(rate * 100).toFixed(1)}%`;
+      rankScoreEl.textContent = `${score.toFixed(1)} / ${maxScore}`;
+      messageEl.textContent = messageFromRank(rank);
+
+      // バー
+      barsEl.innerHTML = "";
+      barsEl.appendChild(barRow("延床", sArea, MAX.area));
+      barsEl.appendChild(barRow("空港距離", sTime, MAX.time));
+      barsEl.appendChild(barRow("駐車場", sParking, MAX.parking));
+      barsEl.appendChild(barRow("旅館業", sPermit, MAX.permit));
+      barsEl.appendChild(barRow("自己資金", sCash, MAX.cash));
+
+      // 結果カードへスクロール（モバイル親切）
+      resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    btn.addEventListener("click", calc);
+
+    // Enterで診断（入力体験UP）
+    [areaEl, timeEl, cashEl].forEach(el => {
+      el.addEventListener("keydown", (e) => {
+        if(e.key === "Enter") calc();
+      });
+    });
+  </script>
+</body>
+</html>
